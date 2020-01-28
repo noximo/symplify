@@ -67,9 +67,18 @@ final class ProcessFactory
     {
         $directory = $this->subsplitCacheDirectory . DIRECTORY_SEPARATOR . Strings::webalize($directory);
 
-        FileSystem::delete($directory);
+        $this->deleteCacheDirectory($directory);
         FileSystem::createDir($directory);
 
         return new Process($commandLine, $directory, null, null, null);
+    }
+
+    private function deleteCacheDirectory(string $directory): void
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            exec(sprintf('rd /s /q %s', escapeshellarg($directory)));
+        } else {
+            exec(sprintf('rm -rf %s', escapeshellarg($directory)));
+        }
     }
 }
